@@ -5,7 +5,6 @@ from render import Renderer
 
 
 def create_example_object() -> VectorObject:
-    """Create a simple cube as an example object"""
     vertices = np.array(
         [
             [-1, -1, -1],

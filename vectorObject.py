@@ -10,6 +10,16 @@ class Surface:
     faces: np.ndarray  # (M, 3) array of face indices
     base_color: np.ndarray  # (3,) RGB color
 
+    def __eq__(self, other):
+        if isinstance(other, Surface):
+            return (
+                np.array_equal(self.vertices, other.vertices)
+                and np.array_equal(self.normals, other.normals)
+                and np.array_equal(self.faces, other.faces)
+                and np.array_equal(self.base_color, other.base_color)
+            )
+        return False
+
 
 class VectorObject:
     def __init__(self, surfaces: List[Surface]):
@@ -18,7 +28,6 @@ class VectorObject:
     def get_visible_surfaces(
         self, camera_position: np.ndarray
     ) -> List[Tuple[Surface, np.ndarray]]:
-        """Return visible surfaces and their center points based on camera position"""
         visible = []
         for surface in self.surfaces:
             center = surface.vertices.mean(axis=0)
