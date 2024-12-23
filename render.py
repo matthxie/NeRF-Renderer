@@ -38,9 +38,7 @@ class Renderer:
             base_colors = torch.FloatTensor(surface.base_color).expand(len(points), -1)
 
             with torch.no_grad():
-                modified_colors = self.model(
-                    positions, normals, surface_ids, view_dirs, light_dirs, base_colors
-                ).numpy()
+                modified_colors = self.model(positions, view_dirs, light_dirs).numpy()
 
             self._update_render_buffer(
                 render_buffer, points, modified_colors, camera_position, resolution
