@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from vectorObject import VectorObject, Surface
 from objectReflectanceNerf import ObjectReflectanceNeRF
 from render import Renderer
@@ -69,6 +70,10 @@ def main():
     image = renderer.render_view(camera_pos, light_pos)
 
     print("Rendered image shape:", image.shape)
+
+    plt.imshow(image)
+    plt.axis("off")
+    plt.show()
 
 
 if __name__ == "__main__":

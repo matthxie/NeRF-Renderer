@@ -32,13 +32,14 @@ class Renderer:
 
             positions = torch.FloatTensor(points)
             normals = torch.FloatTensor(self._interpolate_normals(surface, points))
-            surface_ids = torch.FloatTensor(self._one_hot_encode_surface(surface))
             view_dirs = torch.FloatTensor(view_dirs)
             light_dirs = torch.FloatTensor(light_dirs)
             base_colors = torch.FloatTensor(surface.base_color).expand(len(points), -1)
 
             with torch.no_grad():
-                modified_colors = self.model(positions, view_dirs, light_dirs).numpy()
+                modified_colors = self.model(
+                    positions, view_dirs, light_dirs, base_colors
+                ).numpy()
 
             self._update_render_buffer(
                 render_buffer, points, modified_colors, camera_position, resolution
@@ -53,7 +54,7 @@ class Renderer:
         points = []
         for face in surface.faces:
             v1, v2, v3 = surface.vertices[face]
-            num_samples = 10
+            num_samples = 80
             for _ in range(num_samples):
                 a, b = np.random.random(2)
                 if a + b > 1:
@@ -67,12 +68,6 @@ class Renderer:
         avg_normal = surface.normals.mean(axis=0)
         return np.tile(avg_normal, (len(points), 1))
 
-    def _one_hot_encode_surface(self, surface: Surface) -> np.ndarray:
-        surface_idx = self.object_3d.surfaces.index(surface)
-        encoding = np.zeros(3)
-        encoding[surface_idx % 3] = 1
-        return np.tile(encoding, (len(surface.vertices), 1))
-
     def _update_render_buffer(
         self,
         buffer: np.ndarray,
@@ -83,7 +78,7 @@ class Renderer:
     ):
         height, width = resolution
 
-        f = 500
+        f = 100
         for point, color in zip(points, colors):
             d = point - camera_position
             x = int(f * d[0] / d[2] + width / 2)
