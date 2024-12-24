@@ -16,7 +16,7 @@ class ObjectReflectanceNeRF(nn.Module):
 
         # Color modifier network
         self.color_network = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim),
+            nn.Linear(hidden_dim + 3, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
@@ -24,9 +24,10 @@ class ObjectReflectanceNeRF(nn.Module):
             nn.Sigmoid(),
         )
 
-    def forward(self, positions, view_dirs, light_dirs):
+    def forward(self, positions, view_dirs, light_dirs, base_colors):
         features = self.encoder(torch.cat([positions, view_dirs, light_dirs], dim=1))
+        combined = torch.cat([features, base_colors], dim=1)
 
-        modified_colors = self.color_network(features)
+        modified_colour = self.color_network(combined)
 
-        return modified_colors
+        return modified_colour
