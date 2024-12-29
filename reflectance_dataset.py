@@ -8,8 +8,8 @@ class ReflectanceDataset(Dataset):
     def __init__(
         self,
         positions: np.ndarray,  # (N, 3) array of 3D positions
-        view_dirs: np.ndarray,  # (N, 3) array of view directions
-        light_dirs: np.ndarray,  # (N, 3) array of light directions
+        view_dirs: np.ndarray,  # (N, 2) array of view directions
+        light_dirs: np.ndarray,  # (N, 2) array of light directions
         colors: np.ndarray,  # (N, 3) array of RGB colors
     ):
         self.positions = torch.FloatTensor(positions)
