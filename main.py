@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from vectorObject import VectorObject, Surface
+from rayTracer import RayTracer, Light
 from objectReflectanceNerf import ObjectReflectanceNeRF
 from render import Renderer
 
@@ -59,21 +60,73 @@ def create_example_object() -> VectorObject:
     return VectorObject(surfaces)
 
 
+def create_example_dataset(
+    init_camera_position: np.ndarray,
+    init_light_position: np.ndarray,
+    object: VectorObject,
+):
+    light = Light(
+        position=init_light_position, intensity=1.0, color=np.array([1, 1, 1])
+    )
+    camera_position = init_camera_position
+
+    ray_tracer = RayTracer(init_camera_position, [light])
+
+    positions = []
+    view_dirs = []
+    light_dirs = []
+    colours = []
+
+    for surface, _ in object.get_visible_surfaces(camera_position):
+        points = surface.sample_surface_points(20)
+
+        for point in points:
+            colour = ray_tracer.render_point(point, object)
+
+            cam_diff = camera_position - point
+            light_diff = light.position - point
+
+            theta_cam = np.degrees(np.arctan2(cam_diff[1], cam_diff[0]))
+            phi_cam = np.degrees(
+                np.arctan2(cam_diff[2], np.sqrt(cam_diff[0] ** 2 + cam_diff[1] ** 2))
+            )
+
+            theta_light = np.degrees(np.arctan2(light_diff[1], light_diff[0]))
+            phi_light = np.degrees(
+                np.arctan2(
+                    light_diff[2], np.sqrt(light_diff[0] ** 2 + light_diff[1] ** 2)
+                )
+            )
+
+            positions.append(point)
+            view_dirs.append(np.array([theta_cam, phi_cam]))
+            light_dirs.append(np.array([theta_light, phi_light]))
+            colours.append(colour)
+
+    return positions, view_dirs, light_dirs, colours
+
+
 def main():
     model = ObjectReflectanceNeRF()
     object_3d = create_example_object()
     renderer = Renderer(model, object_3d)
 
-    camera_pos = np.array([3, 3, 3])
-    light_pos = np.array([5, 5, 5])
+    camera_position = np.array([3, 3, 3])
+    light_position = np.array([5, 5, -5])
 
-    image = renderer.render_view(camera_pos, light_pos)
+    image = renderer.render_view(camera_position, light_position)
 
     print("Rendered image shape:", image.shape)
 
-    plt.imshow(image)
-    plt.axis("off")
-    plt.show()
+    positions, view_dirs, light_dirs, colours = create_example_dataset(
+        camera_position, light_position, object_3d
+    )
+
+    print(colours)
+
+    # plt.imshow(image)
+    # plt.axis("off")
+    # plt.show()
 
 
 if __name__ == "__main__":
