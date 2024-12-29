@@ -20,6 +20,19 @@ class Surface:
             )
         return False
 
+    def sample_surface_points(self, num_samples: int) -> np.ndarray:
+        points = []
+        for face in self.faces:
+            v1, v2, v3 = self.vertices[face]
+            for _ in range(num_samples):
+                a, b = np.random.random(2)
+                if a + b > 1:
+                    a, b = 1 - a, 1 - b
+                c = 1 - a - b
+                point = a * v1 + b * v2 + c * v3
+                points.append(point)
+        return np.array(points)
+
 
 class VectorObject:
     def __init__(self, surfaces: List[Surface]):

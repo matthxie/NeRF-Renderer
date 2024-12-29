@@ -22,7 +22,7 @@ class Renderer:
         visible_surfaces = self.object_3d.get_visible_surfaces(camera_position)
 
         for surface, center in visible_surfaces:
-            points = self._generate_surface_points(surface, resolution)
+            points = surface.sample_surface_points(80)
 
             view_dirs = camera_position - points
             view_dirs /= np.linalg.norm(view_dirs, axis=-1, keepdims=True)
@@ -46,23 +46,6 @@ class Renderer:
             )
 
         return render_buffer
-
-    def _generate_surface_points(
-        self, surface: Surface, resolution: Tuple[int, int]
-    ) -> np.ndarray:
-
-        points = []
-        for face in surface.faces:
-            v1, v2, v3 = surface.vertices[face]
-            num_samples = 80
-            for _ in range(num_samples):
-                a, b = np.random.random(2)
-                if a + b > 1:
-                    a, b = 1 - a, 1 - b
-                c = 1 - a - b
-                point = a * v1 + b * v2 + c * v3
-                points.append(point)
-        return np.array(points)
 
     def _interpolate_normals(self, surface: Surface, points: np.ndarray) -> np.ndarray:
         avg_normal = surface.normals.mean(axis=0)
