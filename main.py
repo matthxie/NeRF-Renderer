@@ -81,7 +81,7 @@ def create_example_dataset(
         points = surface.sample_surface_points(20)
 
         for point in points:
-            colour = ray_tracer.render_point(point, object)
+            colour = ray_tracer.calculate_color_at_point(point, object)
 
             cam_diff = camera_position - point
             light_diff = light.position - point

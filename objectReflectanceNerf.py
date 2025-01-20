@@ -16,11 +16,11 @@ class ObjectReflectanceNeRF(nn.Module):
 
         # Color modifier network
         self.color_network = nn.Sequential(
-            nn.Linear(hidden_dim + 3, hidden_dim),
+            nn.Linear(hidden_dim + 3, hidden_dim),  # hidden + base colours (3)
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, 3),
+            nn.Linear(hidden_dim, 3),  # rgb (3)
             nn.Sigmoid(),
         )
 

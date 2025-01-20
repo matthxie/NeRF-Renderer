@@ -136,7 +136,7 @@ class RayTracer:
 
         return self.compute_lighting(intersection)
 
-    def render_point(
+    def calculate_color_at_point(
         self, point: np.ndarray, vector_object: VectorObject
     ) -> Optional[np.ndarray]:
         """

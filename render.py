@@ -47,6 +47,20 @@ class Renderer:
 
         return render_buffer
 
+    def render_scene(
+        self,
+        camera_position: np.ndarray,
+        lighting: np.ndarray,
+        resolution: Tuple[int, int] = (512, 512),
+    ) -> np.ndarray:
+        height, width = resolution
+        render_buffer = np.zeros((height, width, 3))
+
+        visible_surfaces = self.object_3d.get_visible_surfaces(camera_position)
+
+    def set_colours(self, colours):
+        pass
+
     def _interpolate_normals(self, surface: Surface, points: np.ndarray) -> np.ndarray:
         avg_normal = surface.normals.mean(axis=0)
         return np.tile(avg_normal, (len(points), 1))
